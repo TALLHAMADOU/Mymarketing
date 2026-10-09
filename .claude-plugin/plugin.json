@@ -1,0 +1,7 @@
+{
+  "name": "mymarketing",
+  "version": "0.1.0",
+  "description": "Studio vidéo marketing dans Claude Code : /promo-video (tes produits), /tech-post (tes posts tech), /client-ad (pubs clients). Script validé, storyboard validé, puis rendu MP4 en 4:5 et 9:16 avec voix française, musique et textes des posts.",
+  "author": { "name": "Tall Abdoul Aziz Hamdou (Ok)" },
+  "keywords": ["video", "marketing", "motion-design", "hyperframes", "linkedin", "tiktok", "whatsapp"]
+}

@@ -1,0 +1,19 @@
+node_modules/
+moteur/.venv/
+__pycache__/
+*.pyc
+
+# Fichiers de travail des projets vidéo d'exemple (régénérés par mm)
+exemples/**/build/
+exemples/**/audio/
+exemples/**/revue/images-*/
+exemples/**/revue/storyboard.json
+exemples/**/etat.json
+
+# Bibliothèque musicale personnelle (pistes sous licence propre)
+bibliotheque/musique/**/*.mp3
+bibliotheque/musique/**/*.wav
+bibliotheque/musique/**/*.ogg
+bibliotheque/musique/**/*.m4a
+
+.DS_Store

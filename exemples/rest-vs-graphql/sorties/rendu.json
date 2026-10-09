@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-09T21:13:00.960Z",
+  "qualite": "delivery",
+  "audio": {
+    "lufs": -14.11,
+    "crete": -1.5,
+    "musique": "fond généré (bibliothèque vide)"
+  },
+  "videos": [
+    {
+      "fmt": "4x5",
+      "fichier": "rest-vs-graphql-4x5.mp4",
+      "duree": 50.58,
+      "ecart_duree": 0,
+      "taille_mo": 9.774
+    },
+    {
+      "fmt": "9x16",
+      "fichier": "rest-vs-graphql-9x16.mp4",
+      "duree": 50.58,
+      "ecart_duree": 0,
+      "taille_mo": 11.876
+    }
+  ]
+}

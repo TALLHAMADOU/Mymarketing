@@ -1,0 +1,17 @@
+{
+  "name": "mymarketing-moteur",
+  "private": true,
+  "type": "module",
+  "description": "Moteur de rendu de Mymarketing (HyperFrames + GSAP)",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.5",
+    "@fontsource/jetbrains-mono": "^5.2.5",
+    "gsap": "^3.13.0",
+    "hyperframes": "0.8.143",
+    "simple-icons": "^15.0.0",
+    "puppeteer-core": "^25.10.0"
+  }
+}

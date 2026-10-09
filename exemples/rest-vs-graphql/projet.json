@@ -1,0 +1,60 @@
+{
+  "titre": "REST vs GraphQL",
+  "type": "tech-post",
+  "charte": "ok",
+  "signature": true,
+  "duree_cible": 60,
+  "formats": ["4x5", "9x16"],
+  "voix": { "mode": "synth", "voix": "ff_siwis", "vitesse": 1.05 },
+  "musique": { "mode": "auto", "humeur": "tech" },
+  "scenes": [
+    {
+      "type": "accroche",
+      "lignes": ["REST ou *GraphQL* ?", "Le bon choix dépend de ton projet."],
+      "voix": "REST ou GraphQL ?|Le bon choix dépend de ton projet. On compare en une minute."
+    },
+    {
+      "type": "versus",
+      "gauche": { "nom": "REST", "logo": "REST", "sous_titre": "Une URL par ressource" },
+      "droite": { "nom": "GraphQL", "logo": "si:graphql", "sous_titre": "Un seul point d'entrée" },
+      "voix": "REST : une adresse par ressource, avec les verbes HTTP.|GraphQL : un seul point d'entrée, et le client demande exactement les champs qu'il veut."
+    },
+    {
+      "type": "code",
+      "titre": "Afficher un profil *et* ses articles",
+      "blocs": [
+        { "libelle": "REST · 2 requêtes", "code": "GET /users/42\nGET /users/42/posts" },
+        { "libelle": "GraphQL · 1 requête", "code": "query {\n  user(id: 42) {\n    name\n    posts { title }\n  }\n}" }
+      ],
+      "voix": "Pour afficher un profil et ses articles, REST fait souvent deux appels.|GraphQL récupère tout en une seule requête."
+    },
+    {
+      "type": "tableau",
+      "titre": "Critère par critère",
+      "colonnes": ["REST", { "nom": "GraphQL", "logo": "si:graphql" }],
+      "lignes": [
+        { "critere": "Cache HTTP", "a": "Natif", "b": "À gérer", "gagnant": "a" },
+        { "critere": "Données sur mesure", "a": "✗", "b": "✓", "gagnant": "b" },
+        { "critere": "Prise en main", "a": "Simple", "b": "Plus long", "gagnant": "a" },
+        { "critere": "Faire évoluer l'API", "a": "Versions", "b": "Schéma typé", "gagnant": "b" }
+      ],
+      "voix": "Critère par critère.|Le cache HTTP : natif avec REST.|Les données sur mesure : avantage GraphQL.|La prise en main : REST est plus simple.|Et pour faire évoluer l'API, GraphQL s'appuie sur un schéma typé."
+    },
+    {
+      "type": "liste",
+      "titre": "Alors, *lequel* choisir ?",
+      "numerotee": false,
+      "items": [
+        { "titre": "REST", "detail": "API publique, CRUD simple, cache important" },
+        { "titre": "GraphQL", "detail": "Apps mobiles, écrans riches, plusieurs clients" }
+      ],
+      "voix": "Alors, lequel choisir ?|REST, pour une API publique ou un CRUD simple.|GraphQL, quand tes écrans ont besoin de données très variées."
+    },
+    {
+      "type": "appel",
+      "titre": "Et toi, tu utilises *lequel* ?",
+      "action": "Dis-le en commentaire",
+      "voix": "Et toi, tu utilises lequel ?|Dis-le-moi en commentaire."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "mymarketing",
+  "description": "Studio vidéo marketing de Ok pour Claude Code.",
+  "owner": {
+    "name": "Tall Abdoul Aziz Hamdou (Ok)"
+  },
+  "plugins": [
+    {
+      "name": "mymarketing",
+      "source": "./",
+      "description": "Studio vidéo marketing : /promo-video, /tech-post, /client-ad."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "nom": "Ok",
+  "description": "Charte personnelle de Ok pour les tech-posts et ses propres produits : blanc, noir, orange.",
+  "couleurs": {
+    "fond": "#FFFFFF",
+    "surface": "#F4F2EE",
+    "encre": "#0B0B0B",
+    "encre_douce": "#5E5E5E",
+    "accent": "#FF5A1F",
+    "accent_texte": "#D9440E",
+    "sur_accent": "#FFFFFF",
+    "ligne": "#E5E2DC",
+    "positif": "#16A34A",
+    "negatif": "#DC2626",
+    "code_fond": "#111318"
+  },
+  "logo": null,
+  "signature": {
+    "active": true,
+    "nom": "Ok",
+    "ligne": "L'informatique, *sans détour*.",
+    "appel": "Abonne-toi pour le prochain comparatif",
+    "contact": ""
+  },
+  "marque": {
+    "active": true,
+    "texte": "Ok",
+    "libelle": ""
+  },
+  "prononciation": {
+    "API": "A P I",
+    "APIs": "A P I",
+    "REST": "Reste",
+    "GraphQL": "Graphe Q L",
+    "JSON": "Jason",
+    "SQL": "S Q L",
+    "HTTP": "H T T P",
+    "URL": "U R L",
+    "SaaS": "Sasse",
+    "UI": "U I",
+    "UX": "U X",
+    "IA": "I A",
+    "CRUD": "Crude",
+    "CLI": "C L I",
+    "SDK": "S D K",
+    "Go": "Go",
+    "Next.js": "Next J S",
+    "Node.js": "Node J S",
+    "npm": "N P M",
+    "APK": "A P K",
+    "PWA": "P W A",
+    "VPS": "V P S",
+    "FCFA": "francs CFA"
+  }
+}

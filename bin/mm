@@ -1,0 +1,262 @@
+#!/usr/bin/env node
+// mm : la ligne de commande de Mymarketing. Claude Code l'utilise ; tu peux aussi l'utiliser à la main.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const ici = path.dirname(fs.realpathSync(fileURLToPath(import.meta.url)));
+const lib = (m) => import(pathToFileURL(path.join(ici, '..', 'moteur', 'lib', m)).href);
+
+const AIDE = `mm : studio vidéo Mymarketing
+
+  mm nouveau <tech-post|promo|client> "<titre>" [--dans videos]   Crée un projet vidéo
+  mm scenes                                  Liste les types de scènes et leurs champs
+  mm valider [dossier]                       Vérifie projet.json (champs, images, durée estimée)
+  mm voix [dossier] [--forcer]               Génère la voix et calcule la ligne de temps
+  mm construire [dossier]                    Construit les compositions (un dossier par format)
+  mm verifier [dossier]                      Contrôle technique (mise en page, contraste, erreurs)
+  mm storyboard [dossier] [--format 4x5]     Images fixes de chaque scène, à valider avant le rendu
+  mm preparer [dossier]                      valider + voix + construire + verifier + storyboard
+  mm rendre [dossier] [--qualite delivery|draft] [--format 9x16]   Vidéos finales dans sorties/
+  mm capturer <url> --sortie sources/x.png [--mobile] [--pleine]   Capture d'une page web
+  mm capturer --android --sortie sources/x.png                      Capture du téléphone (USB)
+  mm filmer --android --duree 12 --sortie sources/demo.mp4          Film de l'écran du téléphone
+  mm musique                                 Liste la bibliothèque musicale
+  mm musique ajouter <fichier> [--humeur tech|positive|calme|energique]
+  mm etat [dossier]                          Étapes déjà faites
+  mm docteur                                 Vérifie l'installation
+
+Les options --json donnent une sortie lisible par une machine.`;
+
+function options(argv) {
+  const pos = [];
+  const opt = {};
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a.startsWith('--')) {
+      const [k, v] = a.slice(2).split('=');
+      if (v !== undefined) opt[k] = v;
+      else if (argv[i + 1] && !argv[i + 1].startsWith('--')) opt[k] = argv[++i];
+      else opt[k] = true;
+    } else pos.push(a);
+  }
+  return { pos, opt };
+}
+
+const listeFormats = (o) => (o.format ? String(o.format).split(',') : undefined);
+
+async function main() {
+  const [cmd, ...reste] = process.argv.slice(2);
+  const { pos, opt } = options(reste);
+  const util = await lib('util.mjs');
+  const sortie = (obj, texte) => console.log(opt.json ? JSON.stringify(obj, null, 2) : texte ?? JSON.stringify(obj, null, 2));
+
+  switch (cmd) {
+    case undefined:
+    case 'aide':
+    case '--help':
+    case '-h':
+      console.log(AIDE);
+      return;
+
+    case 'nouveau': {
+      const { nouveauProjet } = await lib('projet.mjs');
+      const [type, ...titre] = pos;
+      if (!type || !titre.length) throw new util.ErreurMM('Usage : mm nouveau <tech-post|promo|client> "<titre>"');
+      const d = nouveauProjet(type, titre.join(' '), { dans: opt.dans || 'videos' });
+      sortie({ dossier: d }, `Projet créé : ${d}\nÉcris les scènes dans ${path.join(d, 'projet.json')} (voir "mm scenes").`);
+      return;
+    }
+
+    case 'scenes': {
+      const { SCENES } = await lib('scenes.mjs');
+      const l = Object.entries(SCENES).map(([k, v]) => ({ type: k, requis: v.requis, aide: v.aide }));
+      sortie(l, l.map((s) => `${s.type.padEnd(12)} ${s.aide}`).join('\n'));
+      return;
+    }
+
+    case 'valider': {
+      const { validerProjet } = await lib('projet.mjs');
+      const d = util.dossierProjet(pos[0]);
+      const r = validerProjet(d);
+      const txt = [
+        `${r.scenes ?? 0} scènes · charte ${r.charte || '?'} · durée estimée ~${r.estimation}s`,
+        ...r.erreurs.map((e) => `ERREUR  ${e}`),
+        ...r.avert.map((e) => `ATTENTION  ${e}`),
+        r.erreurs.length ? '' : 'OK',
+      ].join('\n');
+      sortie(r, txt);
+      if (r.erreurs.length) process.exitCode = 1;
+      return;
+    }
+
+    case 'voix': {
+      const { calculerVoix } = await lib('voix.mjs');
+      const d = util.dossierProjet(pos[0]);
+      const tl = calculerVoix(d, { forcer: !!opt.forcer });
+      util.etat(d, 'voix');
+      sortie(tl, `Ligne de temps : ${tl.duree}s, ${tl.scenes.length} scènes (voix : ${tl.mode_voix}).\n` + tl.scenes.map((s, i) => `  ${String(i + 1).padStart(2)}. ${s.type.padEnd(12)} ${s.debut.toFixed(1)}s → ${s.fin.toFixed(1)}s`).join('\n'));
+      return;
+    }
+
+    case 'construire': {
+      const { construire } = await lib('build.mjs');
+      const d = util.dossierProjet(pos[0]);
+      const r = construire(d);
+      util.etat(d, 'construire');
+      sortie(r, r.map((x) => `build/${x.fmt}/index.html (${x.duree}s, ${x.sousTitres} sous-titres)`).join('\n'));
+      return;
+    }
+
+    case 'verifier': {
+      const { verifier } = await lib('rendu.mjs');
+      const d = util.dossierProjet(pos[0]);
+      const r = verifier(d);
+      util.etat(d, 'verifier');
+      const txt = Object.entries(r).map(([f, x]) => `${f} : ${x.erreurs} erreur(s), ${x.avertissements} avertissement(s)\n` + x.problemes.slice(0, 15).map((p) => `   - [${p.gravite}] ${p.code} ${p.message}${p.ou ? ` [${p.ou}]` : ''}${p.temps != null ? ` (t=${p.temps})` : ''}`).join('\n')).join('\n');
+      sortie(r, txt);
+      if (Object.values(r).some((x) => x.erreurs)) process.exitCode = 1;
+      return;
+    }
+
+    case 'storyboard': {
+      const { storyboard } = await lib('rendu.mjs');
+      const d = util.dossierProjet(pos[0]);
+      const r = storyboard(d, { formats: listeFormats(opt) });
+      sortie(r, r.map((x) => `Planche ${x.fmt} : ${x.planche}`).join('\n'));
+      return;
+    }
+
+    case 'preparer': {
+      const d = util.dossierProjet(pos[0]);
+      const { validerProjet } = await lib('projet.mjs');
+      const v = validerProjet(d);
+      if (v.erreurs.length) {
+        sortie(v, v.erreurs.map((e) => `ERREUR  ${e}`).join('\n'));
+        process.exitCode = 1;
+        return;
+      }
+      v.avert.forEach((a) => console.log(`ATTENTION  ${a}`));
+      const { calculerVoix } = await lib('voix.mjs');
+      const tl = calculerVoix(d, { forcer: !!opt.forcer });
+      util.etat(d, 'voix');
+      console.log(`Voix : ${tl.duree}s`);
+      const { construire } = await lib('build.mjs');
+      construire(d);
+      util.etat(d, 'construire');
+      const { verifier, storyboard } = await lib('rendu.mjs');
+      const ver = verifier(d);
+      util.etat(d, 'verifier');
+      for (const [f, x] of Object.entries(ver)) {
+        console.log(`Contrôle ${f} : ${x.erreurs} erreur(s), ${x.avertissements} avertissement(s)`);
+        x.problemes.slice(0, 10).forEach((p) => console.log(`   - [${p.gravite}] ${p.code} ${p.message}${p.ou ? ` [${p.ou}]` : ''}${p.temps != null ? ` (t=${p.temps})` : ''}`));
+      }
+      const sb = storyboard(d, { formats: listeFormats(opt) });
+      sb.forEach((x) => console.log(`Planche ${x.fmt} : ${x.planche}`));
+      return;
+    }
+
+    case 'rendre': {
+      const { rendre } = await lib('rendu.mjs');
+      const d = util.dossierProjet(pos[0]);
+      const r = rendre(d, { qualite: opt.qualite || 'delivery', formats: listeFormats(opt) });
+      sortie(r, r.videos.map((v) => `${v.fichier} (${v.duree}s, ${v.taille_mo} Mo)`).join('\n'));
+      return;
+    }
+
+    case 'capturer': {
+      // mm capturer <url> --sortie sources/x.png [--mobile] [--largeur 1440 --hauteur 900] [--pleine] [--attendre 1500] [--masquer ".cookie"]
+      // mm capturer --android --sortie sources/x.png
+      const cap = await lib('capture.mjs');
+      const dst = path.resolve(opt.sortie || `capture-${Date.now()}.png`);
+      if (opt.android) cap.capturerAndroid(dst);
+      else {
+        if (!pos[0]) throw new util.ErreurMM('Usage : mm capturer <url> --sortie sources/ecran.png [--mobile]  ou  mm capturer --android --sortie …');
+        await cap.capturerWeb(pos[0], dst, opt);
+      }
+      sortie({ fichier: dst }, dst);
+      return;
+    }
+
+    case 'filmer': {
+      // mm filmer --android --duree 12 --sortie sources/demo.mp4
+      const cap = await lib('capture.mjs');
+      if (!opt.android) throw new util.ErreurMM('Seul le téléphone Android est pris en charge : mm filmer --android --duree 12 --sortie sources/demo.mp4');
+      const dst = path.resolve(opt.sortie || `film-${Date.now()}.mp4`);
+      cap.filmerAndroid(dst, +opt.duree || 10);
+      sortie({ fichier: dst }, dst);
+      return;
+    }
+
+    case 'musique': {
+      const { DOSSIER_MUSIQUE, listerMusiques } = await lib('audio.mjs');
+      if (pos[0] === 'ajouter') {
+        const src = pos[1];
+        if (!src || !fs.existsSync(src)) throw new util.ErreurMM('Usage : mm musique ajouter <fichier.mp3> [--humeur tech]');
+        const h = opt.humeur || 'tech';
+        const dst = path.join(DOSSIER_MUSIQUE, h, path.basename(src));
+        fs.mkdirSync(path.dirname(dst), { recursive: true });
+        fs.copyFileSync(src, dst);
+        console.log(`Ajouté : ${dst}`);
+        return;
+      }
+      const humeurs = fs.existsSync(DOSSIER_MUSIQUE) ? fs.readdirSync(DOSSIER_MUSIQUE).filter((x) => fs.statSync(path.join(DOSSIER_MUSIQUE, x)).isDirectory()) : [];
+      const l = Object.fromEntries(humeurs.map((h) => [h, listerMusiques(h).map((f) => path.basename(f))]));
+      const vide = !Object.values(l).some((x) => x.length);
+      sortie(l, vide ? `Bibliothèque vide (${DOSSIER_MUSIQUE}). Un fond musical sera généré automatiquement.\nAjoute des pistes avec : mm musique ajouter <fichier> --humeur tech` : Object.entries(l).map(([h, f]) => `${h} : ${f.join(', ') || '(vide)'}`).join('\n'));
+      return;
+    }
+
+    case 'etat': {
+      const d = util.dossierProjet(pos[0]);
+      sortie(util.etat(d));
+      return;
+    }
+
+    case 'docteur': {
+      const r = [];
+      const essai = (nom, fn) => {
+        try {
+          r.push({ nom, ok: true, detail: fn() });
+        } catch (e) {
+          r.push({ nom, ok: false, detail: e.message.split('\n')[0] });
+        }
+      };
+      essai('Node.js ≥ 22', () => {
+        if (+process.versions.node.split('.')[0] < 22) throw new Error(`version ${process.versions.node}`);
+        return process.versions.node;
+      });
+      essai('ffmpeg', () => util.run('ffmpeg', ['-version']).stdout.split('\n')[0]);
+      essai('python3 + numpy', () => util.run(util.PYTHON, ['-c', 'import numpy;print(numpy.__version__)']).stdout.trim());
+      essai('HyperFrames', () => {
+        if (!fs.existsSync(util.HF_BIN)) throw new Error('lance ./installer.sh');
+        return util.hf(['--version']).stdout.trim();
+      });
+      essai('Chrome de rendu', () => {
+        const x = util.hf(['browser', 'path'], { tolerer: true });
+        if (x.status !== 0) throw new Error('relance ./installer.sh (ou définis HYPERFRAMES_BROWSER_PATH)');
+        return x.stdout.trim().split('\n').pop();
+      });
+      essai('Voix française (Kokoro)', () => {
+        const j = JSON.parse(util.hf(['doctor', '--json']).stdout);
+        const c = (j.checks || []).find((x) => /kokoro/i.test(x.name));
+        if (!c?.ok) throw new Error('installée au premier "mm voix" (ou : npx hyperframes tts --help)');
+        return c.detail;
+      });
+      const { DOSSIER_MUSIQUE } = await lib('audio.mjs');
+      const n = fs.existsSync(DOSSIER_MUSIQUE) ? fs.readdirSync(DOSSIER_MUSIQUE, { recursive: true }).filter((f) => /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(f)).length : 0;
+      r.push({ nom: 'Bibliothèque musicale', ok: true, detail: `${n} piste(s) dans ${DOSSIER_MUSIQUE}${n ? '' : ' (vide : un fond musical sera généré)'}` });
+      sortie(r, r.map((x) => `${x.ok ? 'OK ' : 'NON'}  ${x.nom.padEnd(26)} ${x.detail}`).join('\n'));
+      if (r.some((x) => !x.ok)) process.exitCode = 1;
+      return;
+    }
+
+    default:
+      throw new util.ErreurMM(`Commande inconnue "${cmd}".\n\n${AIDE}`);
+  }
+}
+
+main().catch((e) => {
+  console.error(e.constructor?.name === 'ErreurMM' ? `Erreur : ${e.message}` : e.stack || e.message);
+  process.exit(1);
+});

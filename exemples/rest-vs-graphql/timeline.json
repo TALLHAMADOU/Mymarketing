@@ -1,0 +1,186 @@
+{
+  "duree": 50.58,
+  "mode_voix": "synth",
+  "scenes": [
+    {
+      "index": 0,
+      "type": "accroche",
+      "debut": 0,
+      "fin": 5.725,
+      "temps_forts": [
+        0.3,
+        1.847
+      ],
+      "segments": [
+        {
+          "texte": "REST ou GraphQL ?",
+          "debut": 0.3,
+          "fin": 1.687,
+          "fichier": "audio/cache/1df5cce1b262fe0b.wav"
+        },
+        {
+          "texte": "Le bon choix dépend de ton projet. On compare en une minute.",
+          "debut": 1.847,
+          "fin": 5.175,
+          "fichier": "audio/cache/f1808aecdbb8b3ca.wav"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "type": "versus",
+      "debut": 5.725,
+      "fin": 14.863,
+      "temps_forts": [
+        6.025,
+        9.555
+      ],
+      "segments": [
+        {
+          "texte": "REST : une adresse par ressource, avec les verbes HTTP.",
+          "debut": 6.025,
+          "fin": 9.395,
+          "fichier": "audio/cache/2add8873bd54bce8.wav"
+        },
+        {
+          "texte": "GraphQL : un seul point d'entrée, et le client demande exactement les champs qu'il veut.",
+          "debut": 9.555,
+          "fin": 14.313,
+          "fichier": "audio/cache/a3fa330a3ff84125.wav"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "type": "code",
+      "debut": 14.863,
+      "fin": 22.251,
+      "temps_forts": [
+        15.163,
+        19.141
+      ],
+      "segments": [
+        {
+          "texte": "Pour afficher un profil et ses articles, REST fait souvent deux appels.",
+          "debut": 15.163,
+          "fin": 18.981,
+          "fichier": "audio/cache/721767ffa967fc68.wav"
+        },
+        {
+          "texte": "GraphQL récupère tout en une seule requête.",
+          "debut": 19.141,
+          "fin": 21.701,
+          "fichier": "audio/cache/e13885a0a8968ccc.wav"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "type": "tableau",
+      "debut": 22.251,
+      "fin": 35.752,
+      "temps_forts": [
+        22.551,
+        23.97,
+        26.519,
+        29.282,
+        31.533
+      ],
+      "segments": [
+        {
+          "texte": "Critère par critère.",
+          "debut": 22.551,
+          "fin": 23.81,
+          "fichier": "audio/cache/7a39d8d1e599e025.wav"
+        },
+        {
+          "texte": "Le cache HTTP : natif avec REST.",
+          "debut": 23.97,
+          "fin": 26.359,
+          "fichier": "audio/cache/173a23214942cdef.wav"
+        },
+        {
+          "texte": "Les données sur mesure : avantage GraphQL.",
+          "debut": 26.519,
+          "fin": 29.122,
+          "fichier": "audio/cache/a2f375de88e07e2f.wav"
+        },
+        {
+          "texte": "La prise en main : REST est plus simple.",
+          "debut": 29.282,
+          "fin": 31.373,
+          "fichier": "audio/cache/4e8e6fc090c6436b.wav"
+        },
+        {
+          "texte": "Et pour faire évoluer l'API, GraphQL s'appuie sur un schéma typé.",
+          "debut": 31.533,
+          "fin": 35.202,
+          "fichier": "audio/cache/f84c8c5930e2fc28.wav"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "type": "liste",
+      "debut": 35.752,
+      "fin": 44.133,
+      "temps_forts": [
+        36.052,
+        37.556,
+        40.191
+      ],
+      "segments": [
+        {
+          "texte": "Alors, lequel choisir ?",
+          "debut": 36.052,
+          "fin": 37.396,
+          "fichier": "audio/cache/46998b22402f7298.wav"
+        },
+        {
+          "texte": "REST, pour une API publique ou un CRUD simple.",
+          "debut": 37.556,
+          "fin": 40.031,
+          "fichier": "audio/cache/98aa224bba727049.wav"
+        },
+        {
+          "texte": "GraphQL, quand tes écrans ont besoin de données très variées.",
+          "debut": 40.191,
+          "fin": 43.583,
+          "fichier": "audio/cache/3e323d8f53878b72.wav"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "type": "appel",
+      "debut": 44.133,
+      "fin": 47.98,
+      "temps_forts": [
+        44.433,
+        46.086
+      ],
+      "segments": [
+        {
+          "texte": "Et toi, tu utilises lequel ?",
+          "debut": 44.433,
+          "fin": 45.926,
+          "fichier": "audio/cache/31a3c125bbd359d1.wav"
+        },
+        {
+          "texte": "Dis-le-moi en commentaire.",
+          "debut": 46.086,
+          "fin": 47.43,
+          "fichier": "audio/cache/a7f4e2f6b608e8b8.wav"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "type": "signature",
+      "debut": 47.98,
+      "fin": 50.58,
+      "temps_forts": [],
+      "segments": []
+    }
+  ]
+}
